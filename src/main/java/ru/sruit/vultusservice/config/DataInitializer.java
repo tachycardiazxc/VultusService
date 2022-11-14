@@ -1,6 +1,6 @@
 package ru.sruit.vultusservice.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import ru.sruit.vultusservice.models.entity.Profile;
@@ -18,24 +18,17 @@ import java.util.stream.Stream;
 
 @ConditionalOnExpression("${vultus.runInitializer:true}")
 @Component
+@RequiredArgsConstructor
 public class DataInitializer {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
 
-
     private static final int AMOUNT_OF_ADMINS = intInRange(3, 5);
     private static final int AMOUNT_OF_USERS = intInRange(15, 25);
 
     private final int PROGRESS_BAR_STEPS = (AMOUNT_OF_ADMINS) + (AMOUNT_OF_USERS);
-
-    @Autowired
-    public DataInitializer(UserRepository userRepository, RoleRepository roleRepository, ProfileRepository profileRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.profileRepository = profileRepository;
-    }
 
     private static int intInRange(int startBorder, int endBorder) {
         Random random = new Random(System.nanoTime());
