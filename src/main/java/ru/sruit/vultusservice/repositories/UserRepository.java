@@ -6,4 +6,7 @@ import ru.sruit.vultusservice.models.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    User getUserByUsername(String username);
+
 }
