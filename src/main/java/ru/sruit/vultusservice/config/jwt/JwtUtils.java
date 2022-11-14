@@ -20,7 +20,7 @@ import java.util.Date;
 public class JwtUtils {
 
     private final Key jwtSecret;
-    @Value("${mis.property.jwtExpirationMs}")
+    @Value("${vultus.jwtExpirationPeriod}")
     private int jwtExpirationMs;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
