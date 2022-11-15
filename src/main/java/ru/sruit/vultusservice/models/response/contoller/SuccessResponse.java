@@ -1,4 +1,4 @@
-package ru.sruit.vultusservice.models.response;
+package ru.sruit.vultusservice.models.response.contoller;
 
 public class SuccessResponse <T> extends Response<T> {
 

@@ -1,4 +1,4 @@
-package ru.sruit.vultusservice.models.response;
+package ru.sruit.vultusservice.models.response.contoller;
 
 import lombok.Getter;
 import lombok.Setter;
