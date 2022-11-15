@@ -1,67 +1,43 @@
 package ru.sruit.vultusservice.config.jwt;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.sruit.vultusservice.models.entity.Role;
+import ru.sruit.vultusservice.services.entity.RoleService;
 
-import java.security.Key;
-import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
-public class JwtUtils {
+@RequiredArgsConstructor
+public final class JwtUtils {
 
-    private final Key jwtSecret;
-    @Value("${vultus.jwtExpirationPeriod}")
-    private int jwtExpirationMs;
+    private final RoleService roleService;
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
-    @Autowired
-    public JwtUtils(Key jwtSecret) {
-        this.jwtSecret = jwtSecret;
+    public JwtAuthentication generate(Claims claims) {
+        final JwtAuthentication jwtInfoToken = new JwtAuthentication();
+        jwtInfoToken.setRoles(getRoles(claims));
+        jwtInfoToken.setFirstName(claims.get("firstName", String.class));
+        jwtInfoToken.setUsername(claims.getSubject());
+        return jwtInfoToken;
     }
 
-    public String generateJwtToken(Authentication authentication) {
-
-        User userPrincipal = (User) authentication.getPrincipal();
-
-        return Jwts.builder()
-                .setSubject((userPrincipal.getUsername()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(jwtSecret)
-                .compact();
+    private Set<Role> getRoles(Claims claims) {
+        final List<LinkedHashMap<String, String>> roles = claims.get("roles", List.class);
+        return roles.stream()
+                .map(LinkedHashMap::entrySet)
+                .map(x -> {
+                    Role[] role = {null};
+                    x.forEach(y -> {
+                        if (y.getKey().equals("name")) {
+                            role[0] = roleService.getRoleByName(y.getValue());
+                        }});
+                    return role[0];
+                })
+                .collect(Collectors.toSet());
     }
 
-    public String getUsernameFromJwt(String token) {
-        return Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJwt(token).getBody().getSubject();
-    }
-
-    public boolean validateJwtToken(String authToken) {
-        try {
-            Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJwt(authToken);
-            return true;
-        } catch (SignatureException e) {
-            logger.error("Invalid JWT signature: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
-        }
-
-        return false;
-    }
 }
