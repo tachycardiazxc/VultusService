@@ -1,4 +1,4 @@
-package ru.sruit.vultusservice.config.jwt;
+package ru.sruit.vultusservice.models.response.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginJwtRequest {
 
     @NotBlank
     private String username;
