@@ -2,6 +2,7 @@ package ru.sruit.vultusservice.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.sruit.vultusservice.models.entity.Profile;
 import ru.sruit.vultusservice.models.entity.Role;
@@ -24,6 +25,7 @@ public class DataInitializer {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private static final int AMOUNT_OF_ADMINS = intInRange(3, 5);
     private static final int AMOUNT_OF_USERS = intInRange(15, 25);
@@ -75,7 +77,7 @@ public class DataInitializer {
 
                     User user = userRepository.save(new User(
                             "adminUsername" + x,
-                            "adminPdw" + x,
+                            passwordEncoder.encode("adminPdw" + x),
                             Set.of(userRole, adminRole)));
 
                     // creating profile for admin
@@ -106,7 +108,7 @@ public class DataInitializer {
 
                     User user = userRepository.save(new User(
                             "userUsername" + x,
-                            "userPdw" + x,
+                            passwordEncoder.encode("userPdw" + x),
                             Set.of(userRole)));
 
                     // creating profile for user
