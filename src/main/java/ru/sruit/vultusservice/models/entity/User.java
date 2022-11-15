@@ -34,6 +34,7 @@ public class User implements UserDetails {
     private long id;
     private String username;
     private String password;
+    private String jwtToken;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "users_id"))
     private Set<Role> roles;
