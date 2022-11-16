@@ -24,8 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// TODO: 15.11.2022 тесты работают раз через раз
 
+// FIXME: 15.11.2022 тесты работают раз через раз
 public class AuthControllerIT extends ContextIT {
 
     @Autowired
