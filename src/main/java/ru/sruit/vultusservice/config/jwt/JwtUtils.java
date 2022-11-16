@@ -25,6 +25,7 @@ public final class JwtUtils {
         return jwtInfoToken;
     }
 
+    @SuppressWarnings("unchecked")
     private Set<Role> getRoles(Claims claims) {
         final List<LinkedHashMap<String, String>> roles = claims.get("roles", List.class);
         return roles.stream()

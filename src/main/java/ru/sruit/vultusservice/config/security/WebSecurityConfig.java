@@ -38,7 +38,7 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(
-                        authz -> authz
+                        auth -> auth
                                 .antMatchers("/api/auth/login", "/api/auth/token").permitAll()
                                 .anyRequest().authenticated()
                                 .and()
