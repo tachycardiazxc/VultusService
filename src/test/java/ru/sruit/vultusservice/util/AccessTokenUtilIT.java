@@ -2,12 +2,13 @@ package ru.sruit.vultusservice.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.json.JacksonJsonParser;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.sruit.vultusservice.models.response.jwt.LoginJwtRequest;
+
+import java.util.LinkedHashMap;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,22 +24,30 @@ public class AccessTokenUtilIT {
         this.jsonParser = jsonParser;
     }
 
+    @SuppressWarnings("unchecked")
     public String obtainNewAccessToken(final String username, final String password, MockMvc mockMvc) throws Exception {
         LoginJwtRequest user = new LoginJwtRequest(username, password);
 
         MvcResult response =
-                mockMvc
-                        .perform(
-                                post("/api/auth/login")
-                                        .content(objectMapper.writeValueAsString(user))
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                mockMvc.perform(post("/api/auth/login")
+                                .content(objectMapper.writeValueAsString(user))
+                                .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
                         .andReturn();
 
-        String resultString = response.getResponse().getContentAsString();
+        LinkedHashMap<String, String> linkedHashMap = (LinkedHashMap<String, String>)
+                jsonParser.parseMap(response.getResponse().getContentAsString())
+                        .get("data");
 
-        return jsonParser.parseMap(resultString).get("accessToken").toString();
+        String[] accessToken = {null};
+
+        linkedHashMap.forEach((key, value) -> {
+            if ("accessToken".equals(key)) {
+                accessToken[0] = value;
+            }
+        });
+
+        return "Bearer " + accessToken[0];
     }
 
 }
