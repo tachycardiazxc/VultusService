@@ -1,5 +1,10 @@
 package ru.sruit.vultusservice.models.response.contoller;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class SuccessResponse <T> extends Response<T> {
 
     public SuccessResponse() {
