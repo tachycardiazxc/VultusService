@@ -1,6 +1,7 @@
 package ru.sruit.vultusservice.controller.user;
 
 import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +111,7 @@ public class UserInfoControllerIT extends ContextIT {
 
         accessToken = tokenUtil.obtainNewAccessToken("adminUser", "adminPwd", mockMvc);
 
-        mockMvc.perform(get("/api/user/info")
+        mockMvc.perform(get("/api/user/info/currentUser")
                         .header("Authorization", accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -132,6 +133,79 @@ public class UserInfoControllerIT extends ContextIT {
                 .andExpect(jsonPath("$.data.photoUrl", Is.is(adminProfile.getPhotoUrl())))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
         ;
+    }
+
+    @Test
+    public void getUserInfoByUsernameTest() throws Exception {
+        Role userRole = initRole("USER");
+
+        User userUser1 = initUser("userUser", "userPwd", Set.of(userRole));
+
+        Profile userProfile1 = initUserProfile(
+                userUser1,
+                "userFirstName",
+                "userLastName",
+                "userSurname",
+                "userPhone",
+                LocalDate.now().minusYears(intInRange(18, 50)),
+                "userPosition",
+                "userSubdivision",
+                "userWorkPhone",
+                intInRange(1, 5),
+                "userDesc",
+                "userStatusName",
+                "userStatusText",
+                intInRange(0, 1) == 1,
+                "userPhotoUrl"
+        );
+
+        accessToken = tokenUtil.obtainNewAccessToken("userUser", "userPwd", mockMvc);
+
+        mockMvc.perform(get("/api/user/info/{username}", userUser1.getUsername())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code", Is.is(200)))
+                .andExpect(jsonPath("$.data.firstName", Is.is(userProfile1.getFirstName())))
+                .andExpect(jsonPath("$.data.lastName", Is.is(userProfile1.getLastName())))
+                .andExpect(jsonPath("$.data.surname", Is.is(userProfile1.getSurname())))
+                .andExpect(jsonPath("$.data.phone", Is.is(userProfile1.getPhone())))
+                .andExpect(jsonPath("$.data.birthday", Is.is(userProfile1.getBirthday().format(DATE_FORMATTER))))
+                .andExpect(jsonPath("$.data.position", Is.is(userProfile1.getPosition())))
+                .andExpect(jsonPath("$.data.subdivision", Is.is(userProfile1.getSubdivision())))
+                .andExpect(jsonPath("$.data.workPhone", Is.is(userProfile1.getWorkPhone())))
+                .andExpect(jsonPath("$.data.workPlace", Is.is(userProfile1.getWorkPlace())))
+                .andExpect(jsonPath("$.data.description", Is.is(userProfile1.getDescription())))
+                .andExpect(jsonPath("$.data.statusName", Is.is(userProfile1.getStatusName())))
+                .andExpect(jsonPath("$.data.statusText", Is.is(userProfile1.getStatusText())))
+                .andExpect(jsonPath("$.data.superBusy", Is.is(userProfile1.isSuperBusy())))
+                .andExpect(jsonPath("$.data.photoUrl", Is.is(userProfile1.getPhotoUrl())))
+//                .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
+        ;
+
+        mockMvc.perform(get("/api/user/info/{username}", " ")
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.code", Is.is(411)))
+                .andExpect(jsonPath("$.data", IsNull.nullValue()))
+                .andExpect(jsonPath("$.message", Is.is("Inserted username length less than 1")))
+//                .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
+        ;
+
+        mockMvc.perform(get("/api/user/info/{username}", "notExistingUsername")
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.code", Is.is(404)))
+                .andExpect(jsonPath("$.data", IsNull.nullValue()))
+                .andExpect(jsonPath("$.message", Is.is("User not found")))
+//                .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
+        ;
+
     }
 
 }
