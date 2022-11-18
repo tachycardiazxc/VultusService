@@ -4,6 +4,6 @@ import ru.sruit.vultusservice.models.entity.Profile;
 
 public interface ProfileService {
 
-    Profile getProfileByUserUsername(String user);
+    Profile getProfileByUserUsername(String username);
 
 }
