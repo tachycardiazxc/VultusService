@@ -39,7 +39,11 @@ public class WebSecurityConfig {
                 .and()
                 .authorizeHttpRequests(
                         auth -> auth
-                                .antMatchers("/api/auth/login", "/api/auth/token").permitAll()
+                                .antMatchers("/api/auth/login",
+                                        "/api/auth/token",
+                                        "/api/docs",
+                                        "/api/swagger-ui/**",
+                                        "/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                                 .and()
                                 .addFilterAfter(jwtFiler, UsernamePasswordAuthenticationFilter.class)
