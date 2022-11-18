@@ -77,7 +77,7 @@ public class DataInitializer {
 
                     User user = userRepository.save(new User(
                             "adminUsername" + x,
-                            passwordEncoder.encode("adminPdw" + x),
+                            passwordEncoder.encode("adminPwd" + x),
                             Set.of(userRole, adminRole)));
 
                     // creating profile for admin
@@ -108,7 +108,7 @@ public class DataInitializer {
 
                     User user = userRepository.save(new User(
                             "userUsername" + x,
-                            passwordEncoder.encode("userPdw" + x),
+                            passwordEncoder.encode("userPwd" + x),
                             Set.of(userRole)));
 
                     // creating profile for user
